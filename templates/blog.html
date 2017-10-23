@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    {% if posts|length == 0 %}
+
+    <p class="notify">No Posts yet</p>
+
+    {% else %}
+
+        {% for entry in posts %}
+            <h1><a href="/blog?id={{entry.id}}">{{entry.heading}}</a></h1>
+            <p class="restrict_length">{{entry.content}}</p>
+            <hr />
+        {% endfor %}
+       
+    {% endif %}
+
+{% endblock %}

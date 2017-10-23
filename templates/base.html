@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>{{tab_title}}</title>
+        <style>
+            .link{
+                color:#000;
+                text-decoration:none;
+                border:1px solid;
+                padding:2px;}
+            .notify{
+                font-size:25px;}
+            .restrict_length{
+                width:50%;}
+            .error{color:red;}
+        </style>
+
+    </head>
+
+    <header>
+        <nav>
+            <a href="/blog" class="link">Home Page</a>
+            <a href="/new_entry" class="link">New Entry</a>
+        </nav>
+    </header>
+
+    <hr />
+
+    <body>
+        <h1>{{page_header}}</h1>
+        {% block body %}
+        {% endblock %}
+
+    </body>
+
+</html>
