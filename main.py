@@ -25,55 +25,49 @@ db = SQLAlchemy(app)
 # PYTHON PERSISTENT CLASS THAT INITIALLY CREATES TABLE+ROWS IN MYSQL DB
 
 # TABLE FOR POSTS
-# TODO - We'll also need to amend the Blog class in main.py 
-    # (and in the database) so that it has a property called 
-    # owner_id which is a foreign key linking the user's id to 
-    # the blog post. And we'll need to amend the Blog constructor 
-    # so that it takes in a user object (again, you can review the 
-    # Get It Done! code for a reminder of how to do this)
+# DEFINES owner_id. = a foreign key linking the user's id to the blog post. 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     heading = db.Column(db.String(120))
     content = db.Column(db.String(250))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self,heading,content):
         self.heading = heading
         self.content = content
+        self.owner = owner
 
 # TABLE FOR USER INFO
-# TODO - blogs which signifies a relationship between 
-    # the blog table and this user, thus binding this 
-    # user with the blog posts they write.
+# DEFINES relationship between blog table and user
+    # bind user with the ENTIRES they write.
 class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(100),unique=True)
     password = db.Column(db.String(100))
+    blogs = db.relationship('Blog', backref='owner')
 
     def __init__(self,email,password):
         self.email = email
         self.password = password
 #---------------------------------------------------------
-# TODO - add a require_login function and decorate it with 
-    # @app.before_request. 
-    # The routes that we'll allow are: 'login', 'list_blogs' 
-    # (or whatever you have named your route handler 
-    # function for /blog), 'index', and 'signup'.
-    
-    # Note that when we use request.endpoint to match against 
-    # our allowed_routes list, the endpoint is the name of the 
-    # view function, not the url path. That is why in the list 
-    # above we put 'login' in the allowed_routes list, rather 
-    # than '/login'. And if you have a different name for the 
-    # view function for /blog than list_blogs, substitute your 
-    # function name in the list we create above.
-
-    # If the user is trying to go to any route besides these 
-    # and is not logged in (their username is not stored in a 
-    # session), then we want to redirect them to the /login page.
+# DEFINES require_login function
+    # the endpoint is the name of the view function, not the url path.
+        # list above we put 'login' in allowed_routes list, rather than '/login'
+    # If user clicks any route besides routes in list while not logged in 
+        # (username not stored in session), redirect them to the /login page.
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')
 #---------------------------------------------------------  
 # TODO - We'll have a logout function that handles a POST 
     # request to /logout and redirects the user to /blog after 
     # deleting the username from the session.
+@app.route('/logout')
+def logout():
+    del session['email']
+    return redirect('/')
 #---------------------------------------------------------
 # TODO - We want to require that users have an account 
     # and be logged in to be able to access the /newpost page. 
@@ -112,7 +106,18 @@ def start():
     # blog user's page.
 @app.route('/index', methods=['GET'])
 def index():
-    return redirect('/')
+    owner = User.query.filter_by(email=session['email']).first()
+    
+    if request.method == 'POST':
+        task_name = request.form['task']
+        new_task = Task(task_name, owner)
+        db.session.add(new_task)
+        db.session.commit()
+
+    tasks = Task.query.filter_by(completed=False,owner=owner).all()
+    completed_tasks = Task.query.filter_by(completed=True,owner=owner).all()
+    return render_template('todos.html',title="Get It Done!", 
+        tasks=tasks, completed_tasks=completed_tasks)
 #---------------------------------------------------------
 # HANDLES SIGNUP INFO & DIPLAYS THE signup.html FORM
 # TODO - For /signup page:
@@ -121,9 +126,27 @@ def index():
     # User enters a username that already exists and gets an error message that username already exists.
     # User enters different strings into the password and verify fields and gets an error message that the passwords do not match.
     # User enters a password or username less than 3 characters long and gets either an invalid username or an invalid password message.
-@app.route('/signup', methods=['GET'])
+@app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    return redirect('/')
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        verify = request.form['verify']
+
+        # TODO - validate user's data
+
+        existing_user = User.query.filter_by(email=email).first()
+        if not existing_user:
+            new_user = User(email, password)
+            db.session.add(new_user)
+            db.session.commit()
+            session['email'] = email
+            return redirect('/')
+        else:
+            # TODO - user better response messaging
+            return "<h1>Duplicate user</h1>"
+
+    return render_template('signup.html')
 #---------------------------------------------------------
 # HANDLES LOGIN INFO & DIPLAYS THE login.html FORM
 # TODO - User enters a username that is stored in the db with an 
@@ -137,9 +160,20 @@ def signup():
     # User enters a username that is stored in the database with an incorrect password and is redirected to the /login page with a message that their password is incorrect.
     # User tries to login with a username that is not stored in the database and is redirected to the /login page with a message that this username does not exist.
     # User does not have an account and clicks "Create Account" and is directed to the /signup page.
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    return redirect('/')
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and user.password == password:
+            session['email'] = email
+            flash("Logged in")
+            return redirect('/')
+        else:
+            flash('User password incorrect, or user does not exist', 'error')
+
+    return render_template('login.html')
 #---------------------------------------------------------
 # DISPLAYS ALL BLOG POSTS ON blog.html
 # GETS ID AND RENDERS new_entry.html WITH SPECIFIC ENTRY

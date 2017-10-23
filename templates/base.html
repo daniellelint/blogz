@@ -8,32 +8,36 @@
             .link{
                 color:#000;
                 text-decoration:none;
-                border:1px solid;
                 padding:2px;}
             .notify{
                 font-size:25px;}
             .restrict_length{
                 width:50%;}
             .error{color:red;}
-            .left{margin-left:30px;}
-            .right{margin-right:30px;}
+            .left{
+                float:left;
+                margin-left:2%;}
+            .right{
+                float:right;
+                margin-right:2%;}
+            .clear{clear:both;}
         </style>
 
     </head>
 
     <header>
         <div class="left">
-            <a href="/blog" class="link">Home Page</a>
-            <a href="" class="link">View all Entries</a>
-            <a href="/new_entry" class="link">New Entry</a>
+            <a href="/blog" class="link">Home Page | </a>
+            <a href="" class="link">View all Entries | </a>
+            <a href="/new_entry" class="link">New Entry | </a>
         </div>
         <div class="right">
-            <a href="/login" class="link">Log-in</a>
-            <a href="/logout" class="link">Log-out</a>
+            <a href="/login" class="link">Log-in | </a>
+            <a href="" class="link">Log-out</a>
         </div>
     </header>
 
-    <hr />
+    <hr class="clear"/>
 
     <body>
         <h1>{{page_header}}</h1>
