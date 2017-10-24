@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <h3>View Entry:</h3>
+    <hr/>
+
+    <h1><a href="/blog?id={{single_entry.id}}">{{single_entry.heading}}</a></h1>
+
+    <p class="restrict_length">{{single_entry.content}}</p>
+
+    <p>Author:<a href="blogz?user={{blog.owner}}">{{blog.owner}}</a></p>
+
+{% endblock %}

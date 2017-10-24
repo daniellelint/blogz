@@ -1,28 +1,33 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Register to Get It Done!</h1>
-<form action="/register" method="post">
-    <table>
-        <tr>
-            <td><label for="email">Email</label></td>
-            <td>
-                <input name="email" type="email" value="{{ email }}">
-            </td>
-        </tr>
-        <tr>
-            <td><label for="password">Password</label></td>
-            <td>
-                <input name="password" type="password">
-            </td>
-        </tr>
-        <tr>
-            <td><label for="verify">Verify Password</label></td>
-            <td>
-                <input name="verify" type="password">
-            </td>
-        </tr>
-    </table>
-    <input type="submit" value="Register">
-</form>
+{% block body %}
+
+    <h3>Sign Up!</h3>
+    <p>Already have an account? <a href="/login">Login</a> Here!!</p>
+    <hr/>
+    
+    <form action="/signup" method='POST'>
+
+        <label for="email">Email
+           <input name="email" type="text" value="{{ email }}"></label>
+        <p class="error">{{email_error}}</p> 
+
+        <br>
+           
+        <label for="password">Password
+            <input name="password" type="password"></label>
+        <p class="error">{{password_error}}</p>
+
+        <br>
+
+        <label for="password_check">Verify Password
+            <input name="password_check" type="password"></label>
+        <p class="error">{{password_error}}</p>
+
+        <br>
+            
+        <input type="submit" value="Sign Up">
+
+    </form>
+
 {% endblock %}

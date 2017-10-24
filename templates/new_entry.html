@@ -2,7 +2,24 @@
 
 {% block body %}
 
-    <h1><a href="/blog?id={{single_entry.id}}">{{single_entry.heading}}</a></h1>
-    <p class="restrict_length">{{single_entry.content}}</p>
+    <h3>Add a New Entry:</h3>
+    <hr/>
+
+    <form action="/new_entry" method='POST'>
+        <label>Entry Title:
+            <input type="text" name='heading' value="{{heading_input}}"/></label>
+        <p class="error">{{heading_error}}</p>
+
+        <br>
+
+        <label>Entry Content:
+            <textarea type="text" name='content' value="{{content_input}}"></textarea></label>
+        <p class="error">{{content_error}}</p>
+
+        <br>
+
+        <input type="submit" value="Add Entry to Blog"/>
+        
+    </form>
 
 {% endblock %}
