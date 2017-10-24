@@ -53,16 +53,25 @@ class User(db.Model):
 # DEFINES VALIDATION FUNCTIONS (taken from user-signup assignment, adapted)
 def validate_email(email):
     email_error = ''
-    valid_char = ['@', '.']
+    #y_char = '@'
+    #x_char = '.'
     if email == "":
         email_error = "Email required to submit."
-        for single_char in valid_char:
-            if single_char not in email:
-                email_error = "Input requires the following characters to be a valid email address: @, ."
+        return email_error
     if " " in email:
         email_error = "Email address cannot contain spaces."
-    if len(email) > 20 or len(email) < 3:
+        return email_error
+    if len(email) >= 100:
         email_error = "Email length requirements: 3 - 20 Characters Only"
+        return email_error
+    if len(email) <= 3:
+        email_error = "Email length requirements: 3 - 20 Characters Only"
+        return email_error
+    if '@' not in email:
+        email_error = "Input requires the following characters to be a valid email address: @"
+        return email_error
+    if '.' not in email:
+        email_error = "Input requires the following characters to be a valid email address: ."
         return email_error
 
 def validate_pw(password,password_check):
@@ -79,11 +88,11 @@ def validate_pw(password,password_check):
         return password_error
     
 #---------------------------------------------------------
-# @app.before_request
-# def require_login():
-#     allowed_routes = ['login','signup','index','blog']
-#     if request.endpoint not in allowed_routes and 'email' not in session:
-#         return redirect('/login')
+@app.before_request
+def require_login():
+    allowed_routes = ['login','signup','index','blog']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')
 #---------------------------------------------------------
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -125,20 +134,20 @@ def login():
         email = request.form['email']
         password = request.form['password']
         password_check = request.form['password_check']
-        
         email_error = validate_email(email)
         password_error = validate_pw(password, password_check)
         login_error = "User does not exist"
         
         if not email_error and not password_error:
             user = User.query.filter_by(email=email).first()
-            if user and user.password == password:
+            #this works with not inserted but not correct 
+            if user and User.password == password:
                 session['email'] = email
                 return redirect('/')
             else:
-                return render_template('login.html', email=email,login_error=login_error)
+                return render_template('login.html',tab_title="Log In (post1)",email=email,login_error=login_error)
         else:
-            return render_template('login.html', email_error = email_error, email = email, 
+            return render_template('login.html',tab_title="Log In (post2)",email_error = email_error, email = email, 
                                     password_error = password_error)
     if request.method == 'GET':
         return render_template('login.html',tab_title="Log In (get)")
