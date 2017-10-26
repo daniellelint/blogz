@@ -13,7 +13,8 @@
 
     {% for each_user in users %}
       
-        <a href="blogz?user={{user.email}}">{{user.email}}</a>
+        <a href="/?user={{users.email}}">{{each_user}}</a>
+        <hr/>
        
       {% endfor%}
 
